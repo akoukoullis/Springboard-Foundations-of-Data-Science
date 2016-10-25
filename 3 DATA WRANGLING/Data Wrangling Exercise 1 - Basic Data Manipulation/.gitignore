@@ -1,0 +1,11 @@
+# Include your project-specific ignores in this file
+# Read about how to use .gitignore: https://help.github.com/articles/ignoring-files
+*~
+*.log
+.DS_Store
+Thumbs.db
+.Rhistory
+.RData
+.sync/
+node_modules/
+bower_components/
