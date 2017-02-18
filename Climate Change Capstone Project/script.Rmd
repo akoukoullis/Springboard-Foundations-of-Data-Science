@@ -1,0 +1,265 @@
+---
+output:
+  html_document: default
+  pdf_document: default
+---
+
+![](./images/climate-change-banner.jpg)
+
+# Foundations of Data Science
+## Capstone Project - Analysis of Climate Change
+
+_Author: Anthony Koukoullis_
+
+```{r include = FALSE}
+load_data <- function(filename, skipLines = 0){
+  
+  result <- tryCatch({
+    
+    table <- tbl_df(read.csv(filename, skip = skipLines, stringsAsFactors = FALSE, blank.lines.skip = TRUE))
+    
+    return(table)
+    
+  }, error = function(e){
+    
+    print("Unfortunately the data couldn't be loaded: ", e)
+    
+    return(FALSE)
+  })
+  
+  return(result)
+}
+
+
+land_surface_water_temp_cleanup <- function(table){
+  
+  result <- tryCatch({
+    
+    for (i in seq_len(nrow(table))){
+      table[i,"AverageTemp"] <- suppressWarnings(mean(as.numeric(table[i,2:13]), na.rm = TRUE))
+    }
+    
+    table <- table[, c("Year", "AverageTemp")]
+    
+    return(table)
+    
+  }, error = function(e){
+    
+    print("Unfortunately the product categories couldn't be added: ", e)
+    
+    return(FALSE)
+    
+  })
+  
+  return (result)
+}
+
+
+
+global_mean_sea_level_cleanup <- function(table){
+  
+  result <- tryCatch({
+    
+    table_mean <- tbl_df(aggregate(table[, 2], list(floor(table$Time)), mean))
+    table_mean[,2] <- round(table_mean[,2], 2)
+    
+    names(table_mean)[1] <- "Year"
+    names(table_mean)[2] <- "GMSL"
+    
+    return(table_mean)
+    
+  }, error = function(e){
+    
+    print("Unfortunately the product categories couldn't be added: ", e)
+    
+    return(FALSE)
+    
+  })
+  
+  return (result)
+}
+
+
+
+atmospheric_co2_levels_cleanup <- function(table){
+  
+  result <- tryCatch({
+    
+    names(table)[1] <- "Year"
+    names(table)[2] <- "GlobalMeanCO2"
+    
+    table <- table[, 1:2]
+    
+    return(table)
+    
+  }, error = function(e){
+    
+    print("Unfortunately the product categories couldn't be added: ", e)
+    
+    return(FALSE)
+    
+  })
+  
+  return (result)
+}
+
+
+global_temperature_cleanup <- function(table){
+  
+  #result <- tryCatch({
+    
+    names(table)[1] <- "Year"
+    names(table)[2] <- "TempMean"
+    
+    table <- table[, 1:2]
+    table <- table[!(is.na(table$TempMean) | table$TempMean == "" | table$TempMean == "------" | table$TempMean == "-----------"),]
+    table[,2] <- round(as.numeric(unlist(table[,2])), 2)
+    table[,1] <- as.integer(unlist(table[,1]))
+    
+    return(table)
+    
+  #}, error = function(e){
+    
+    #print("Unfortunately the product categories couldn't be added: ", e)
+    
+    #return(FALSE)
+    
+  #})
+  
+  return (result)
+}
+```
+
+``` {r include = FALSE}
+# Install package dependencies if not already installed
+installed_packages <- installed.packages()
+if (is.element("dplyr", installed_packages[,"Package"]) == FALSE) { install.packages("dplyr") }
+if (is.element("tidyr", installed_packages[,"Package"]) == FALSE) { install.packages("tidyr") }
+library("dplyr")
+library("tidyr")
+library("ggplot2")
+
+# Set the full path of your RStudio working directory to the "local_working_dir" variable if necessary,
+#local_working_dir <- ""
+#setwd(local_working_dir)
+```
+
+---
+
+### Global Mean Estimates Based on Land-Surface Air Temperature Anomalies Only (Meteorological Station Data, dTs)
+[http://data.giss.nasa.gov/gistemp/](http://data.giss.nasa.gov/gistemp/)
+
+### 
+
+``` {r}
+land_surface_water_temp_filename <- "./data/GLB.Ts.csv"
+land_surface_water_temp <- load_data(land_surface_water_temp_filename)
+land_surface_water_temp <- land_surface_water_temp_cleanup(land_surface_water_temp)
+#View(land_surface_water_temp)
+ggplot(land_surface_water_temp, aes(x = Year, y = AverageTemp)) +
+  geom_line() +
+  stat_smooth(method = "lm", col = "red", se = FALSE) +
+  labs(title = "Global Mean Estimates Based on Land-Surface Air Temperature")
+```
+
+---
+
+### Global Mean Estimates Based on Land-Surface Air Temperature Anomalies Only (Meteorological Station Data, dTs)
+[http://www.cmar.csiro.au/sealevel/sl_data_cmar.html](http://www.cmar.csiro.au/sealevel/sl_data_cmar.html)
+
+###
+
+
+``` {r}
+global_mean_sea_level_filename <- "./data/CSIRO_Recons_gmsl_mo_2015.csv"
+global_mean_sea_level <- load_data(global_mean_sea_level_filename)
+global_mean_sea_level <- global_mean_sea_level_cleanup(global_mean_sea_level)
+#View(global_mean_sea_level)
+ggplot(global_mean_sea_level, aes(x = Year, y = GMSL)) +
+  geom_line() +
+  stat_smooth(method = "lm", col = "red", se = FALSE) +
+  labs(title = "Global Mean Sea Level")
+```
+
+---
+
+### Historical CO2 Data  |  Years 0 to 2014 
+[https://www.co2.earth/historical-co2-datasets](https://www.co2.earth/historical-co2-datasets)
+
+###
+
+``` {r}
+atmospheric_co2_levels_filename <- "./data/mole_fraction_of_carbon_dioxide_in_air_input4MIPs_GHGConcentrations_CMIP_UoM-CMIP-1-1-0_gr3-GMNHSH_0000-2014.csv"
+atmospheric_co2_levels <- load_data(atmospheric_co2_levels_filename)
+atmospheric_co2_levels <- atmospheric_co2_levels_cleanup(atmospheric_co2_levels)
+#View(atmospheric_co2_levels)
+ggplot(global_mean_sea_level, aes(x = Year, y = GMSL)) +
+  geom_line() +
+  stat_smooth(method = "lm", col = "red", se = FALSE) +
+  labs(title = "Atmospheric CO2 Levels")
+```
+
+---
+
+### Historical Mean Global Temperature | Years 1880 to 2015
+[https://data.giss.nasa.gov/gistemp/graphs_v3/Fig.A2.txt](https://data.giss.nasa.gov/gistemp/graphs_v3/Fig.A2.txt)
+
+###
+
+``` {r}
+global_temperature_filename <- "./data/647_Global_Temperature_Data_File.csv"
+global_temperature <- load_data(global_temperature_filename, skipLines = 2)
+global_temperature <- global_temperature_cleanup(global_temperature)
+ggplot(global_temperature, aes(x = Year, y = TempMean)) +
+  geom_line() +
+  stat_smooth(method = "lm", col = "red", se = FALSE) +
+  labs(title = "Global Temperature", y = "Mean Global Temperature")
+#View(global_temperature)
+```
+
+---
+
+### Global Mean Sea Level vs Atmospheric CO2 Levels
+###
+
+``` {r}
+# Join GMSL and CO2 data
+gmsl_co2 <- inner_join(global_mean_sea_level, atmospheric_co2_levels, by = "Year")
+ggplot(gmsl_co2, aes(x = GlobalMeanCO2, y = GMSL)) +
+  geom_line() +
+  stat_smooth(method = "lm", col = "red", se = FALSE) +
+  labs(title = "Global Mean Sea Level vs Atmospheric CO2 Levels", x = "Global Mean Atmospheric CO2 Levels", y = "Global Mean Sea Level")
+```
+
+---
+
+### Land-Surface Air Temperatures vs Atmospheric CO2 Levels
+###
+
+``` {r}
+# Join LSWT and CO2 data
+lswt_co2 <- inner_join(land_surface_water_temp, atmospheric_co2_levels, by = "Year")
+ggplot(lswt_co2, aes(x = GlobalMeanCO2, y = AverageTemp)) +
+  geom_line() +
+  stat_smooth(method = "lm", col = "red", se = FALSE) +
+  labs(title = "Land-Surface Air Temperatures vs Atmospheric CO2 Levels", x = "Global Mean Atmospheric CO2 Levels", y = "Land Surface Water Temperature")
+```
+
+---
+
+### Global Temperature vs Atmospheric CO2 Levels
+###
+
+``` {r}
+# Join GT and CO2 data
+gt_co2 <- inner_join(global_temperature, atmospheric_co2_levels, by = "Year")
+ggplot(gt_co2, aes(x = GlobalMeanCO2, y = TempMean)) +
+  geom_line() +
+  stat_smooth(method = "lm", col = "red", se = FALSE) +
+  labs(title = "Global Temperature vs Atmospheric CO2 Levels", x = "Global Mean Atmospheric CO2 Levels", y = "Mean Global Temperature")
+```
+
+``` {r include = FALSE}
+# Save clean data to different csv file
+# save_data(land_surface_water_temp, clean_filename)
+```
