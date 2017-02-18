@@ -1,11 +1,15 @@
 ---
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
-## Foundations of Data Science
-### Capstone Project - Analysis of Climate Change
-Author: Anthony Koukoullis
+
+![](./images/climate-change-banner.jpg)
+
+# Foundations of Data Science
+## Capstone Project - Analysis of Climate Change
+
+_Author: Anthony Koukoullis_
 
 ```{r include = FALSE}
 load_data <- function(filename, skipLines = 0){
@@ -140,10 +144,15 @@ library("ggplot2")
 #setwd(local_working_dir)
 ```
 
+---
+
+### Global Mean Estimates Based on Land-Surface Air Temperature Anomalies Only (Meteorological Station Data, dTs)
+[http://data.giss.nasa.gov/gistemp/](http://data.giss.nasa.gov/gistemp/)
+
+### 
+
 ``` {r}
-# Global Mean Estimates Based on Land-Surface Air Temperature Anomalies Only (Meteorological Station Data, dTs)
-# http://data.giss.nasa.gov/gistemp/
-land_surface_water_temp_filename <- "GLB.Ts.csv"
+land_surface_water_temp_filename <- "./data/GLB.Ts.csv"
 land_surface_water_temp <- load_data(land_surface_water_temp_filename)
 land_surface_water_temp <- land_surface_water_temp_cleanup(land_surface_water_temp)
 #View(land_surface_water_temp)
@@ -153,10 +162,16 @@ ggplot(land_surface_water_temp, aes(x = Year, y = AverageTemp)) +
   labs(title = "Global Mean Estimates Based on Land-Surface Air Temperature")
 ```
 
+---
+
+### Global Mean Estimates Based on Land-Surface Air Temperature Anomalies Only (Meteorological Station Data, dTs)
+[http://www.cmar.csiro.au/sealevel/sl_data_cmar.html](http://www.cmar.csiro.au/sealevel/sl_data_cmar.html)
+
+###
+
+
 ``` {r}
-# Global Mean Estimates Based on Land-Surface Air Temperature Anomalies Only (Meteorological Station Data, dTs)
-# http://www.cmar.csiro.au/sealevel/sl_data_cmar.html
-global_mean_sea_level_filename <- "CSIRO_Recons_gmsl_mo_2015.csv"
+global_mean_sea_level_filename <- "./data/CSIRO_Recons_gmsl_mo_2015.csv"
 global_mean_sea_level <- load_data(global_mean_sea_level_filename)
 global_mean_sea_level <- global_mean_sea_level_cleanup(global_mean_sea_level)
 #View(global_mean_sea_level)
@@ -166,10 +181,15 @@ ggplot(global_mean_sea_level, aes(x = Year, y = GMSL)) +
   labs(title = "Global Mean Sea Level")
 ```
 
+---
+
+### Historical CO2 Data  |  Years 0 to 2014 
+[https://www.co2.earth/historical-co2-datasets](https://www.co2.earth/historical-co2-datasets)
+
+###
+
 ``` {r}
-# Historical CO2 Data  |  Years 0 to 2014 
-# https://www.co2.earth/historical-co2-datasets
-atmospheric_co2_levels_filename <- "mole_fraction_of_carbon_dioxide_in_air_input4MIPs_GHGConcentrations_CMIP_UoM-CMIP-1-1-0_gr3-GMNHSH_0000-2014.csv"
+atmospheric_co2_levels_filename <- "./data/mole_fraction_of_carbon_dioxide_in_air_input4MIPs_GHGConcentrations_CMIP_UoM-CMIP-1-1-0_gr3-GMNHSH_0000-2014.csv"
 atmospheric_co2_levels <- load_data(atmospheric_co2_levels_filename)
 atmospheric_co2_levels <- atmospheric_co2_levels_cleanup(atmospheric_co2_levels)
 #View(atmospheric_co2_levels)
@@ -179,8 +199,15 @@ ggplot(global_mean_sea_level, aes(x = Year, y = GMSL)) +
   labs(title = "Atmospheric CO2 Levels")
 ```
 
+---
+
+### Historical Mean Global Temperature | Years 1880 to 2015
+[https://data.giss.nasa.gov/gistemp/graphs_v3/Fig.A2.txt](https://data.giss.nasa.gov/gistemp/graphs_v3/Fig.A2.txt)
+
+###
+
 ``` {r}
-global_temperature_filename <- "647_Global_Temperature_Data_File.csv"
+global_temperature_filename <- "./data/647_Global_Temperature_Data_File.csv"
 global_temperature <- load_data(global_temperature_filename, skipLines = 2)
 global_temperature <- global_temperature_cleanup(global_temperature)
 ggplot(global_temperature, aes(x = Year, y = TempMean)) +
@@ -189,6 +216,11 @@ ggplot(global_temperature, aes(x = Year, y = TempMean)) +
   labs(title = "Global Temperature", y = "Mean Global Temperature")
 #View(global_temperature)
 ```
+
+---
+
+### Global Mean Sea Level vs Atmospheric CO2 Levels
+###
 
 ``` {r}
 # Join GMSL and CO2 data
@@ -199,6 +231,11 @@ ggplot(gmsl_co2, aes(x = GlobalMeanCO2, y = GMSL)) +
   labs(title = "Global Mean Sea Level vs Atmospheric CO2 Levels", x = "Global Mean Atmospheric CO2 Levels", y = "Global Mean Sea Level")
 ```
 
+---
+
+### Land-Surface Air Temperatures vs Atmospheric CO2 Levels
+###
+
 ``` {r}
 # Join LSWT and CO2 data
 lswt_co2 <- inner_join(land_surface_water_temp, atmospheric_co2_levels, by = "Year")
@@ -207,6 +244,11 @@ ggplot(lswt_co2, aes(x = GlobalMeanCO2, y = AverageTemp)) +
   stat_smooth(method = "lm", col = "red", se = FALSE) +
   labs(title = "Land-Surface Air Temperatures vs Atmospheric CO2 Levels", x = "Global Mean Atmospheric CO2 Levels", y = "Land Surface Water Temperature")
 ```
+
+---
+
+### Global Temperature vs Atmospheric CO2 Levels
+###
 
 ``` {r}
 # Join GT and CO2 data

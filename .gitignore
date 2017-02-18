@@ -10,3 +10,4 @@ Thumbs.db
 node_modules/
 bower_components/
 Data Wrangling with R and RStudio/
+raw_data/
